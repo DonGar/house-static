@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <link rel="icon" type="image/jpg" href="favicon.ico">
+  <title>Status</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=700">
+
+  <link rel="stylesheet" type="text/css" media="screen,print" href="Site.css">
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+  <!-- {% block header_javascript %} -->
+  <script type="text/javascript">
+
+    revision_status = 0;
+    revision_logs = 0;
+
+    function update_status() {
+      $.get('/status/?revision='+revision_status,
+            function(unparsed_data) {
+        data = $.parseJSON(unparsed_data);
+        revision_status = data['revision'];
+        $("#status").html(unparsed_data);
+      }, 'text')
+      .success(function() { setTimeout("update_status()", 0); })
+      .error(function() { setTimeout("update_status()", 10000); })
+    };
+
+    function update_logs() {
+      $.get('/log/?revision='+revision_logs, function(unparsed_data) {
+        data = $.parseJSON(unparsed_data);
+        revision_logs = data['revision'];
+        $("#logs").html(unparsed_data);
+      }, 'text')
+      .success(function() { setTimeout("update_logs()", 0); })
+      .error(function() { setTimeout("update_logs()", 10000); })
+    };
+
+    $(document).ready(function() {
+      update_status();
+      update_logs();
+    });
+
+  </script>
+  <!-- {% endblock %} -->
+</head>
+
+<body>
+  <div id="content_background" style="width: 700px; ">
+    <div id="content_borders">
+      <header>
+        <!-- {% block nav_bar %} -->
+        <nav id="navigation_bar">
+          <ul class="navbar-list">
+            <li><a href="index.html">Welcome</a></li>
+            <li class="current-page"><a href="status.html">Status</a></li>
+            <li><a href="manage.html">Manage</a></li>
+          </ul>
+        </nav>
+
+        <div id="site_title">
+         <p class="Header">House</p>
+        </div>
+        <!-- {% endblock %} -->
+
+        <!-- {% block photo %} -->
+        <div id="site_photo" style="text-align: center; margin-bottom: 10px">
+          <img src="house.png" alt="Side View of House" height="227" width="398" style="border: solid 1px" />
+        </div>
+        <!-- {% endblock %} -->
+      </header>
+
+      <!-- {% block body %} -->
+      <pre id="status">
+        Status content not yet loaded.
+      </pre>
+
+      <pre id="logs">
+        Log content not yet loaded.
+      </pre>
+      <!--  {% endblock %} -->
+
+    </div>
+  </div>
+</body>
+</html>
