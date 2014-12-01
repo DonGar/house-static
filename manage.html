@@ -3,7 +3,7 @@
 <html>
 <head>
   <link rel="icon" type="image/jpg" href="favicon.ico">
-  <title>Wake</title>
+  <title>Manage</title>
 
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=700">
@@ -11,6 +11,28 @@
   <link rel="stylesheet" type="text/css" media="screen,print" href="Site.css">
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+  <!-- {% block header_javascript %} -->
+  <script type="text/javascript">
+
+    revision_logs = 0;
+
+    function update_logs() {
+      $.get('/log/?revision='+revision_logs, function(unparsed_data) {
+        data = $.parseJSON(unparsed_data);
+        revision_logs = data['revision'];
+        $("#logs").html(unparsed_data);
+      }, 'text')
+      .success(function() { setTimeout("update_logs()", 0); })
+      .error(function() { setTimeout("update_logs()", 10000); })
+    };
+
+    $(document).ready(function() {
+      update_logs();
+    });
+
+  </script>
+  <!-- {% endblock %} -->
 </head>
 
 <body>
@@ -39,29 +61,10 @@
       </header>
 
       <!-- {% block body %} -->
-      <div class="WorkingBlock">
-        <div style="float: left;" id='working_url'>Idle</div>
-        <div style="float: right;" id='working_result'></div>
-        <div class="Clear"></div>
-      </div>
-
-      <div>
-        <p class="Header">Server</p>
-
-        <div class="Redirect">/restart</div>
-      </div>
+      <pre id="logs">
+        Log content not yet loaded.
+      </pre>
       <!--  {% endblock %} -->
-
-
-  <script type="text/javascript">
-    $(".Redirect").click(function() {
-      url = $(this).text();
-      $("#working_url").text(url);
-      $("#working_result").text('...');
-      $("#working_result").load(url);
-    });
-  </script>
-
 
     </div>
   </div>
