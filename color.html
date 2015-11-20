@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <link rel="icon" type="image/jpg" href="favicon.ico">
+  <title>Status</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=700">
+
+  <link rel="stylesheet" type="text/css" media="screen,print" href="Site.css">
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+  <!-- {% block header_javascript %} -->
+  <script type="text/javascript">
+
+    data = {}
+    revision_status = 0;
+
+    function update_status() {
+      $.get('/status/particle/core/garage/strip?revision='+revision_status,
+            function(unparsed_data) {
+        data = $.parseJSON(unparsed_data);
+        revision_status = data['revision'];
+        update_color();
+      }, 'text')
+      .success(function() { setTimeout("update_status()", 0); })
+      .error(function() { setTimeout("update_status()", 10000); })
+    };
+
+    function update_color() {
+      if ("status" in data) {
+        $("#status").val(data.status);
+      } else {
+        $("#status").val("Unknown colors.");
+      }
+    }
+
+    $(document).ready(function() {
+      $( "#update_form" ).submit(on_submit);
+
+      update_status();
+    });
+
+    function on_submit(event) {
+      event.preventDefault();
+
+      data = JSON.stringify($("#status").val())
+
+      $.ajax({
+         url: '/status/particle/core/garage/strip_target',
+         type: 'PUT',
+         contentType: 'application/json',
+         data: data,
+         error: function(response) {
+           update_status();
+         }
+      });
+    }
+
+  </script>
+  <!-- {% endblock %} -->
+</head>
+
+<body>
+  <div id="content_background" style="width: 700px; ">
+    <div id="content_borders">
+      <header>
+        <nav id="navigation_bar">
+          <ul class="navbar-list">
+            <li><a href="index.html">Welcome</a></li>
+            <li class="current-page"><a href="status.html">Status</a></li>
+            <li><a href="manage.html">Manage</a></li>
+          </ul>
+        </nav>
+
+        <div id="site_title">
+         <p class="Header">House</p>
+        </div>
+
+        <div id="site_photo" style="text-align: center; margin-bottom: 10px">
+          <img src="house.png" alt="Side View of House" height="227" width="398" style="border: solid 1px" />
+        </div>
+      </header>
+
+      <form id="update_form">
+        <input type="text" id="status" name="data" value="not yet loaded." size="50">
+        <input type="submit" value="Submit">
+      </form>
+
+    </div>
+  </div>
+</body>
+</html>
